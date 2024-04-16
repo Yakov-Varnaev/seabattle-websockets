@@ -11,7 +11,7 @@ type LocalStore struct {
 	data map[string]*Game
 }
 
-func (store *LocalStore) Save(game *Game) (*Game, error) {
+func (store LocalStore) Save(game *Game) (*Game, error) {
 	if game.Id == "" {
 		id := uuid.NewString()
 		game.Id = id
@@ -22,7 +22,7 @@ func (store *LocalStore) Save(game *Game) (*Game, error) {
 	return game, nil
 }
 
-func (store *LocalStore) Get(id string) (*Game, error) {
+func (store LocalStore) Get(id string) (*Game, error) {
 	game, ok := store.data[id]
 	if !ok {
 		slog.Error("Game not found.", "id", id)
@@ -30,4 +30,14 @@ func (store *LocalStore) Get(id string) (*Game, error) {
 	}
 	slog.Info("Game was succesfully retrieved.", "id", id)
 	return game, nil
+}
+
+func (store LocalStore) List() ([]*Game, error) {
+	games := make([]*Game, len(store.data))
+	i := 0
+	for _, v := range store.data {
+		games[i] = v
+		i++
+	}
+	return games, nil
 }

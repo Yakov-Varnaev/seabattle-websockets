@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"log/slog"
 	"time"
 )
@@ -30,6 +31,13 @@ type Game struct {
 	Field1  *Field
 	Field2  *Field
 	Created time.Time
+}
+
+func (game *Game) GetPlayerLinks() map[string]string {
+	return map[string]string{
+		"player1": fmt.Sprintf("/game/%s/player/1", game.Id),
+		"player2": fmt.Sprintf("/game/%s/player/2", game.Id),
+	}
 }
 
 func NewGame() *Game {
