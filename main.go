@@ -6,15 +6,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var field [3][3]string = [3][3]string{}
+
 func CreateRouter() *gin.Engine {
+	hub := newHub()
+	go hub.run()
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	r.POST("/game", createGame)
-	r.GET("/game/:gameId/player/:playerId", retrieveGame)
+	r.GET("/ws", func(c *gin.Context) {
+		serveWs(hub, c.Writer, c.Request)
+	})
 	return r
 }
 
