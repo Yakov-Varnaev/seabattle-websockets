@@ -1,6 +1,9 @@
 package seabattle
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Direction string
 
@@ -41,7 +44,9 @@ type Ship struct {
 	direction Direction
 }
 
-// Returns ship's coordinates
+// Returns ship's coordinates. It's guaranteed that
+// cell[i].X <= cell[j].X and cell[i].Y <= cell[j].Y
+// where i < j.
 func (s Ship) GetCoordinates() []Cell {
 	length, ok := SHIP_LENGTH_BY_TYPE[s.kind]
 	if !ok {
@@ -67,6 +72,13 @@ func (s Ship) GetCoordinates() []Cell {
 			}
 		}
 	}
+	sort.Slice(coordinates, func(i, j int) bool {
+		ci, cj := coordinates[i], coordinates[j]
+		if ci.X == cj.X {
+			return ci.Y < cj.Y
+		}
+		return ci.X < cj.X
+	})
 	return coordinates
 }
 
@@ -83,7 +95,7 @@ func (s Ships) GetCoordinates() map[Cell]*Ship {
 }
 
 type Field struct {
-	Shots map[*Cell]bool
+	Shots map[Cell]bool
 	Ships Ships
 }
 

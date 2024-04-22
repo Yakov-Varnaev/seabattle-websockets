@@ -61,6 +61,34 @@ func TestShip_GetCoordinates(t *testing.T) {
 			},
 			want: []Cell{{5, 5}, {6, 5}, {7, 5}, {8, 5}},
 		},
+		{
+			name: "ShipFour in the center of the field direction left",
+			fields: fields{
+				kind:      ShipFour,
+				coord:     Cell{5, 5},
+				direction: LEFT,
+			},
+			want: []Cell{
+				{2, 5},
+				{3, 5},
+				{4, 5},
+				{5, 5},
+			},
+		},
+		{
+			name: "ShipFour in the center of the field direction up",
+			fields: fields{
+				kind:      ShipFour,
+				coord:     Cell{5, 5},
+				direction: UP,
+			},
+			want: []Cell{
+				{5, 2},
+				{5, 3},
+				{5, 4},
+				{5, 5},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -70,6 +98,7 @@ func TestShip_GetCoordinates(t *testing.T) {
 				direction: tt.fields.direction,
 			}
 			if got := s.GetCoordinates(); !reflect.DeepEqual(got, tt.want) {
+				t.Logf("%+v", s)
 				t.Errorf("Ship.GetCoordinates() = %v, want %v", got, tt.want)
 			}
 		})
