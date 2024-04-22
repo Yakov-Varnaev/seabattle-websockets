@@ -75,3 +75,40 @@ func TestShip_GetCoordinates(t *testing.T) {
 		})
 	}
 }
+
+func TestShips_GetCoordinates(t *testing.T) {
+	shipOne := Ship{
+		kind:      ShipOne,
+		coord:     Cell{0, 0},
+		direction: DOWN,
+	}
+	shipFour := Ship{
+		kind:      ShipFour,
+		coord:     Cell{2, 0},
+		direction: DOWN,
+	}
+	tests := []struct {
+		name string
+		s    Ships
+		want map[Cell]*Ship
+	}{
+		{
+			name: "Simple test",
+			s:    Ships{&shipOne, &shipFour},
+			want: map[Cell]*Ship{
+				{0, 0}: &shipOne,
+				{2, 0}: &shipFour,
+				{2, 1}: &shipFour,
+				{2, 2}: &shipFour,
+				{2, 3}: &shipFour,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.s.GetCoordinates(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ships.GetCoordinates() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

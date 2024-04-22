@@ -72,6 +72,16 @@ func (s Ship) GetCoordinates() []Cell {
 
 type Ships []*Ship
 
+func (s Ships) GetCoordinates() map[Cell]*Ship {
+	coordinates := map[Cell]*Ship{}
+	for _, ship := range s {
+		for _, coord := range ship.GetCoordinates() {
+			coordinates[coord] = ship
+		}
+	}
+	return coordinates
+}
+
 type Field struct {
 	Shots map[*Cell]bool
 	Ships Ships
@@ -83,10 +93,6 @@ func (f *Field) AsMap() SeabattleMap {
 	m := SeabattleMap{}
 	//TODO: Finish this method
 	return m
-}
-
-func (f *Field) GetShip(cell Cell) *Ship {
-	return nil
 }
 
 type State struct {
