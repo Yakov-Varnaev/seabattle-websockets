@@ -2,6 +2,7 @@ package seabattle
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"sort"
 )
 
@@ -99,6 +100,24 @@ type Field struct {
 	Ships Ships
 }
 
+func NewField() *Field {
+	return &Field{
+		Shots: map[Cell]bool{},
+		Ships: Ships{},
+	}
+}
+
+func (f *Field) FillRect(c1, c2 Cell) {
+	if c1.X > c2.X || c1.Y > c2.Y {
+		panic("c1 must be less than c2")
+	}
+	for x := c1.X; x <= c2.X; x++ {
+		for y := c1.Y; y <= c2.Y; y++ {
+			f.Shots[Cell{x, y}] = true
+		}
+	}
+}
+
 // This method will return the matrix which represents
 // the game field as a game map.
 func (f *Field) AsMap() SeabattleMap {
@@ -121,9 +140,29 @@ func (s *State) Turn() string {
 	return s.turn
 }
 
+func (s *State) NextTurn() {
+	log.Info("Switching turn")
+	if s.turn == "1" {
+		s.turn = "2"
+	} else {
+		s.turn = "1"
+	}
+}
+
 type Game struct {
 	State  *State
 	Id     string
 	Field1 *Field
 	Field2 *Field
+}
+
+func NewGame() *Game {
+	return &Game{
+		State: &State{
+			turn: "1",
+		},
+		Id:     "1",
+		Field1: NewField(),
+		Field2: NewField(),
+	}
 }
