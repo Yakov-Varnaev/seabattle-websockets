@@ -34,7 +34,7 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	field.Shots[targetCell] = true // we should do it in the very end probably
 
 	// check if we hit the ship
-	shipsCoords := field.Ships.GetCoordinates()
+	shipsCoords := field.Ships.GetCells()
 	ship, ok := shipsCoords[targetCell]
 	if !ok {
 		log.WithFields(logFields).Info("No ship at the target cell")
@@ -46,7 +46,7 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	logFields["kind"] = ship.kind
 	logFields["direction"] = ship.direction
 	log.WithFields(logFields).Info("Hit the ship")
-	shipCoords := ship.GetCoordinates() // maybe it's better to filter coordinates from shipsCoords?
+	shipCoords := ship.GetCells() // maybe it's better to filter coordinates from shipsCoords?
 
 	isShipDead := true
 	for _, coord := range shipCoords {

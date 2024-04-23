@@ -97,7 +97,7 @@ func TestShip_GetCoordinates(t *testing.T) {
 				coord:     tt.fields.coord,
 				direction: tt.fields.direction,
 			}
-			if got := s.GetCoordinates(); !reflect.DeepEqual(got, tt.want) {
+			if got := s.GetCells(); !reflect.DeepEqual(got, tt.want) {
 				t.Logf("%+v", s)
 				t.Errorf("Ship.GetCoordinates() = %v, want %v", got, tt.want)
 			}
@@ -135,7 +135,7 @@ func TestShips_GetCoordinates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.GetCoordinates(); !reflect.DeepEqual(got, tt.want) {
+			if got := tt.s.GetCells(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Ships.GetCoordinates() = %v, want %v", got, tt.want)
 			}
 		})

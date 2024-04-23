@@ -58,7 +58,7 @@ type Ship struct {
 // Returns ship's coordinates. It's guaranteed that
 // cell[i].X <= cell[j].X and cell[i].Y <= cell[j].Y
 // where i < j.
-func (s Ship) GetCoordinates() []Cell {
+func (s Ship) GetCells() []Cell {
 	length, ok := SHIP_LENGTH_BY_TYPE[s.kind]
 	if !ok {
 		panic(fmt.Sprintf("Unknown ShipKind=%s", s.kind))
@@ -89,10 +89,10 @@ func (s Ship) GetCoordinates() []Cell {
 
 type Ships []*Ship
 
-func (s Ships) GetCoordinates() map[Cell]*Ship {
+func (s Ships) GetCells() map[Cell]*Ship {
 	coordinates := map[Cell]*Ship{}
 	for _, ship := range s {
-		for _, coord := range ship.GetCoordinates() {
+		for _, coord := range ship.GetCells() {
 			coordinates[coord] = ship
 		}
 	}
