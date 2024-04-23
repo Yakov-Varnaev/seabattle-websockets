@@ -1,13 +1,10 @@
 package seabattle
 
 import (
-	"errors"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
 )
-
-var AlreadyShot error = errors.New("Cell is already shot.")
 
 type Engine struct {
 	Game *Game
@@ -30,7 +27,7 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	_, ok := field.Shots[targetCell]
 	// if there is shot then we shouldn't process it
 	if ok {
-		return filledCells, AlreadyShot
+		return filledCells, &AlreadyShot{targetCell}
 	}
 	log.WithFields(logFields).Info("Hit Cell")
 	filledCells = append(filledCells, targetCell)

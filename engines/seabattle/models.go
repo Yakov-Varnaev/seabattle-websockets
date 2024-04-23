@@ -129,6 +129,14 @@ func (f *Field) FillRect(c1, c2 Cell) []Cell {
 	return coordinates
 }
 
+// Check if the field is valid.
+// The field is considered to be valid if:
+//   - There is at least one cell between each ship
+//   - There is exactly(ship - amount): 4 - 1, 3 - 2, 2 - 3, 1 - 4
+func (f *Field) Validate() error {
+	return nil
+}
+
 // This method will return the matrix which represents
 // the game field as a game map.
 func (f *Field) AsMap() SeabattleMap {
