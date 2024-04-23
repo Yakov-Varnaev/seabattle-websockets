@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestShip_GetCoordinates(t *testing.T) {
+func TestShip_GetCells(t *testing.T) {
 	type fields struct {
 		kind      ShipKind
 		coord     Cell
@@ -99,13 +99,13 @@ func TestShip_GetCoordinates(t *testing.T) {
 			}
 			if got := s.GetCells(); !reflect.DeepEqual(got, tt.want) {
 				t.Logf("%+v", s)
-				t.Errorf("Ship.GetCoordinates() = %v, want %v", got, tt.want)
+				t.Errorf("Ship.GetCells() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestShips_GetCoordinates(t *testing.T) {
+func TestShips_GetCells(t *testing.T) {
 	shipOne := Ship{
 		kind:      ShipOne,
 		coord:     Cell{0, 0},
@@ -136,7 +136,7 @@ func TestShips_GetCoordinates(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.s.GetCells(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Ships.GetCoordinates() = %v, want %v", got, tt.want)
+				t.Errorf("Ships.GetCells() = %v, want %v", got, tt.want)
 			}
 		})
 	}
