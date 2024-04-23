@@ -183,10 +183,13 @@ func TestEngine_Shot(t *testing.T) {
 					t.Fatalf("Engine.Shot() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				if !reflect.DeepEqual(tt.want.filledCells[i], filledCells) {
-					t.Errorf("filledCells \nwant:%v\ngot: %v\n", tt.want.filledCells[i], filledCells)
+					t.Fatalf("filledCells \nwant:%v\ngot: %v\n", tt.want.filledCells[i], filledCells)
 				}
 				if !reflect.DeepEqual(expectedShots, e.Game.Field2.Shots) {
-					t.Errorf("Engine.Game.Field2.Shots want: %v\ngot:  %v", tt.want.shots, e.Game.Field2.Shots)
+					t.Fatalf("Engine.Game.Field2.Shots want: %v\ngot:  %v", tt.want.shots, e.Game.Field2.Shots)
+				}
+				if e.Game.State.Turn() != "1" {
+					t.Fatalf("If player hit the ship his turn should continue")
 				}
 			}
 
