@@ -39,6 +39,16 @@ type Cell struct {
 	Y int
 }
 
+func SortCells(a []Cell) {
+	sort.Slice(a, func(i, j int) bool {
+		ci, cj := a[i], a[j]
+		if ci.X == cj.X {
+			return ci.Y < cj.Y
+		}
+		return ci.X < cj.X
+	})
+}
+
 type Ship struct {
 	kind      ShipKind
 	coord     Cell
@@ -73,13 +83,7 @@ func (s Ship) GetCoordinates() []Cell {
 			}
 		}
 	}
-	sort.Slice(coordinates, func(i, j int) bool {
-		ci, cj := coordinates[i], coordinates[j]
-		if ci.X == cj.X {
-			return ci.Y < cj.Y
-		}
-		return ci.X < cj.X
-	})
+	SortCells(coordinates)
 	return coordinates
 }
 
@@ -107,15 +111,22 @@ func NewField() *Field {
 	}
 }
 
-func (f *Field) FillRect(c1, c2 Cell) {
+func (f *Field) FillRect(c1, c2 Cell) []Cell {
+	coordinates := []Cell{}
 	if c1.X > c2.X || c1.Y > c2.Y {
 		panic("c1 must be less than c2")
 	}
 	for x := c1.X; x <= c2.X; x++ {
 		for y := c1.Y; y <= c2.Y; y++ {
-			f.Shots[Cell{x, y}] = true
+			c := Cell{x, y}
+			_, wasFilled := f.Shots[c]
+			f.Shots[c] = true
+			if !wasFilled {
+				coordinates = append(coordinates, c)
+			}
 		}
 	}
+	return coordinates
 }
 
 // This method will return the matrix which represents

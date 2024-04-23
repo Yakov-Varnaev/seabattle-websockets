@@ -13,7 +13,8 @@ type Engine struct {
 	Game *Game
 }
 
-func (e *Engine) Shot(targetCell Cell) error {
+func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
+	filledCells := []Cell{}
 	turn := e.Game.State.Turn()
 	logFields := log.Fields{
 		"turn":       turn,
@@ -29,9 +30,10 @@ func (e *Engine) Shot(targetCell Cell) error {
 	_, ok := field.Shots[targetCell]
 	// if there is shot then we shouldn't process it
 	if ok {
-		return AlreadyShot
+		return filledCells, AlreadyShot
 	}
 	log.WithFields(logFields).Info("Hit Cell")
+	filledCells = append(filledCells, targetCell)
 	field.Shots[targetCell] = true // we should do it in the very end probably
 
 	// check if we hit the ship
@@ -41,7 +43,7 @@ func (e *Engine) Shot(targetCell Cell) error {
 		log.WithFields(logFields).Info("No ship at the target cell")
 		// if there is no ship just return the current result
 		e.Game.State.NextTurn()
-		return nil
+		return filledCells, nil
 	}
 
 	logFields["kind"] = ship.kind
@@ -64,11 +66,14 @@ func (e *Engine) Shot(targetCell Cell) error {
 		// fill space around the ship
 		log.Info("Filling cells around the ship")
 		lastIdx := len(shipCoords) - 1
-		field.FillRect(
+		filled := field.FillRect(
 			Cell{shipCoords[0].X - 1, shipCoords[0].Y - 1},
 			Cell{shipCoords[lastIdx].X + 1, shipCoords[lastIdx].Y + 1},
 		)
+		filledCells = append(filledCells, filled...)
 	}
 
-	return nil
+	SortCells(filledCells)
+
+	return filledCells, nil
 }

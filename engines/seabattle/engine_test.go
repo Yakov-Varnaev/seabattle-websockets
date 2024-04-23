@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// This test is a *bit* overloaded, but it does it's job
 func TestEngine_Shot(t *testing.T) {
 	type fields struct {
 		Game  *Game
@@ -13,11 +14,16 @@ func TestEngine_Shot(t *testing.T) {
 	type args struct {
 		targetCells []Cell
 	}
+	type want struct {
+		shots       []map[Cell]bool
+		filledCells [][]Cell
+	}
+
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    map[Cell]bool
+		want    want
 		wantErr bool
 	}{
 		{
@@ -33,10 +39,19 @@ func TestEngine_Shot(t *testing.T) {
 				},
 			},
 			args: args{targetCells: []Cell{{1, 1}}},
-			want: map[Cell]bool{
-				{0, 0}: true, {1, 0}: true, {2, 0}: true,
-				{0, 1}: true, {1, 1}: true, {2, 1}: true,
-				{0, 2}: true, {1, 2}: true, {2, 2}: true,
+			want: want{
+				shots: []map[Cell]bool{
+					{
+						{0, 0}: true, {1, 0}: true, {2, 0}: true,
+						{0, 1}: true, {1, 1}: true, {2, 1}: true,
+						{0, 2}: true, {1, 2}: true, {2, 2}: true,
+					},
+				},
+				filledCells: [][]Cell{{
+					{0, 0}, {0, 1}, {0, 2},
+					{1, 0}, {1, 1}, {1, 2},
+					{2, 0}, {2, 1}, {2, 2},
+				}},
 			},
 			wantErr: false,
 		},
@@ -53,8 +68,13 @@ func TestEngine_Shot(t *testing.T) {
 				},
 			},
 			args: args{targetCells: []Cell{{5, 5}}},
-			want: map[Cell]bool{
-				{5, 5}: true,
+			want: want{
+				shots: []map[Cell]bool{{
+					{5, 5}: true,
+				}},
+				filledCells: [][]Cell{{
+					{5, 5},
+				}},
 			},
 			wantErr: false,
 		},
@@ -70,33 +90,75 @@ func TestEngine_Shot(t *testing.T) {
 					},
 				},
 			},
-			args: args{targetCells: []Cell{
-				{5, 2},
-				{5, 3},
-				{5, 4},
-				{5, 5},
-			}},
-			want: map[Cell]bool{
-				{4, 1}: true,
-				{4, 2}: true,
-				{4, 3}: true,
-				{4, 4}: true,
-				{4, 5}: true,
-				{4, 6}: true,
+			args: args{
+				targetCells: []Cell{
+					{5, 2},
+					{5, 3},
+					{5, 4},
+					{5, 5},
+				},
+			},
+			want: want{
+				shots: []map[Cell]bool{
+					{
+						{5, 2}: true,
+					},
+					{
+						{5, 3}: true,
+					},
+					{
+						{5, 4}: true,
+					},
+					{
+						{4, 1}: true,
+						{4, 2}: true,
+						{4, 3}: true,
+						{4, 4}: true,
+						{4, 5}: true,
+						{4, 6}: true,
 
-				{5, 1}: true,
-				{5, 2}: true,
-				{5, 3}: true,
-				{5, 4}: true,
-				{5, 5}: true,
-				{5, 6}: true,
+						{5, 1}: true,
+						{5, 5}: true,
+						{5, 6}: true,
 
-				{6, 1}: true,
-				{6, 2}: true,
-				{6, 3}: true,
-				{6, 4}: true,
-				{6, 5}: true,
-				{6, 6}: true,
+						{6, 1}: true,
+						{6, 2}: true,
+						{6, 3}: true,
+						{6, 4}: true,
+						{6, 5}: true,
+						{6, 6}: true,
+					},
+				},
+				filledCells: [][]Cell{
+					{
+						{5, 2},
+					},
+					{
+						{5, 3},
+					},
+					{
+						{5, 4},
+					},
+					{
+						{4, 1},
+						{4, 2},
+						{4, 3},
+						{4, 4},
+						{4, 5},
+						{4, 6},
+
+						{5, 1},
+						{5, 5},
+						{5, 6},
+
+						{6, 1},
+						{6, 2},
+						{6, 3},
+						{6, 4},
+						{6, 5},
+						{6, 6},
+					},
+				},
 			},
 			wantErr: false,
 		},
@@ -109,15 +171,25 @@ func TestEngine_Shot(t *testing.T) {
 			e := &Engine{
 				Game: tt.fields.Game,
 			}
-			for _, shotCell := range tt.args.targetCells {
-				if err := e.Shot(shotCell); (err != nil) != tt.wantErr {
-					t.Errorf("Engine.Shot() error = %v, wantErr %v", err, tt.wantErr)
+			expectedShots := map[Cell]bool{}
+			for i := range tt.args.targetCells {
+
+				for k := range tt.want.shots[i] {
+					expectedShots[k] = true
+				}
+
+				filledCells, err := e.Shot(tt.args.targetCells[i])
+				if (err != nil) != tt.wantErr {
+					t.Fatalf("Engine.Shot() error = %v, wantErr %v", err, tt.wantErr)
+				}
+				if !reflect.DeepEqual(tt.want.filledCells[i], filledCells) {
+					t.Errorf("filledCells \nwant:%v\ngot: %v\n", tt.want.filledCells[i], filledCells)
+				}
+				if !reflect.DeepEqual(expectedShots, e.Game.Field2.Shots) {
+					t.Errorf("Engine.Game.Field2.Shots want: %v\ngot:  %v", tt.want.shots, e.Game.Field2.Shots)
 				}
 			}
 
-			if !reflect.DeepEqual(tt.want, e.Game.Field2.Shots) {
-				t.Errorf("Engine.Game.Field2.Shots want=%v, got %v", tt.want, e.Game.Field2.Shots)
-			}
 		})
 	}
 }
