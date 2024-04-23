@@ -33,7 +33,7 @@ func TestEngine_Shot(t *testing.T) {
 				Ships: Ships{
 					{
 						kind:      ShipOne,
-						coord:     Cell{1, 1},
+						cell:      Cell{1, 1},
 						direction: UP,
 					},
 				},
@@ -62,7 +62,7 @@ func TestEngine_Shot(t *testing.T) {
 				Ships: Ships{
 					{
 						kind:      ShipFour,
-						coord:     Cell{5, 5},
+						cell:      Cell{5, 5},
 						direction: UP,
 					},
 				},
@@ -85,7 +85,7 @@ func TestEngine_Shot(t *testing.T) {
 				Ships: Ships{
 					{
 						kind:      ShipFour,
-						coord:     Cell{5, 5},
+						cell:      Cell{5, 5},
 						direction: UP,
 					},
 				},

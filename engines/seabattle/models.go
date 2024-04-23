@@ -51,11 +51,11 @@ func SortCells(a []Cell) {
 
 type Ship struct {
 	kind      ShipKind
-	coord     Cell
+	cell      Cell
 	direction Direction
 }
 
-// Returns ship's coordinates. It's guaranteed that
+// Returns ship's cells. It's guaranteed that
 // cell[i].X <= cell[j].X and cell[i].Y <= cell[j].Y
 // where i < j.
 func (s Ship) GetCells() []Cell {
@@ -63,7 +63,7 @@ func (s Ship) GetCells() []Cell {
 	if !ok {
 		panic(fmt.Sprintf("Unknown ShipKind=%s", s.kind))
 	}
-	coordinates := make([]Cell, length)
+	cells := make([]Cell, length)
 	multiplier := 1
 	if s.direction == UP || s.direction == LEFT {
 		multiplier = -1
@@ -71,32 +71,32 @@ func (s Ship) GetCells() []Cell {
 	for i := 0; i < length; i++ {
 		if s.direction == UP || s.direction == DOWN {
 			// add cells vertically
-			coordinates[i] = Cell{
-				X: s.coord.X,
-				Y: s.coord.Y + (i * multiplier),
+			cells[i] = Cell{
+				X: s.cell.X,
+				Y: s.cell.Y + (i * multiplier),
 			}
 		} else {
 			// add cells horizontally
-			coordinates[i] = Cell{
-				X: s.coord.X + (i * multiplier),
-				Y: s.coord.Y,
+			cells[i] = Cell{
+				X: s.cell.X + (i * multiplier),
+				Y: s.cell.Y,
 			}
 		}
 	}
-	SortCells(coordinates)
-	return coordinates
+	SortCells(cells)
+	return cells
 }
 
 type Ships []*Ship
 
 func (s Ships) GetCells() map[Cell]*Ship {
-	coordinates := map[Cell]*Ship{}
+	cells := map[Cell]*Ship{}
 	for _, ship := range s {
-		for _, coord := range ship.GetCells() {
-			coordinates[coord] = ship
+		for _, cell := range ship.GetCells() {
+			cells[cell] = ship
 		}
 	}
-	return coordinates
+	return cells
 }
 
 type Field struct {
@@ -112,7 +112,7 @@ func NewField() *Field {
 }
 
 func (f *Field) FillRect(c1, c2 Cell) []Cell {
-	coordinates := []Cell{}
+	cells := []Cell{}
 	if c1.X > c2.X || c1.Y > c2.Y {
 		panic("c1 must be less than c2")
 	}
@@ -122,11 +122,11 @@ func (f *Field) FillRect(c1, c2 Cell) []Cell {
 			_, wasFilled := f.Shots[c]
 			f.Shots[c] = true
 			if !wasFilled {
-				coordinates = append(coordinates, c)
+				cells = append(cells, c)
 			}
 		}
 	}
-	return coordinates
+	return cells
 }
 
 // Check if the field is valid.

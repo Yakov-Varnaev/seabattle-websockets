@@ -94,7 +94,7 @@ func TestShip_GetCells(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Ship{
 				kind:      tt.fields.kind,
-				coord:     tt.fields.coord,
+				cell:      tt.fields.coord,
 				direction: tt.fields.direction,
 			}
 			if got := s.GetCells(); !reflect.DeepEqual(got, tt.want) {
@@ -108,12 +108,12 @@ func TestShip_GetCells(t *testing.T) {
 func TestShips_GetCells(t *testing.T) {
 	shipOne := Ship{
 		kind:      ShipOne,
-		coord:     Cell{0, 0},
+		cell:      Cell{0, 0},
 		direction: DOWN,
 	}
 	shipFour := Ship{
 		kind:      ShipFour,
-		coord:     Cell{2, 0},
+		cell:      Cell{2, 0},
 		direction: DOWN,
 	}
 	tests := []struct {

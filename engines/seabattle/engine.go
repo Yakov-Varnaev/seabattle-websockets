@@ -46,10 +46,10 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	logFields["kind"] = ship.kind
 	logFields["direction"] = ship.direction
 	log.WithFields(logFields).Info("Hit the ship")
-	shipCoords := ship.GetCells() // maybe it's better to filter coordinates from shipsCoords?
+	shipCells := ship.GetCells() // maybe it's better to filter coordinates from shipsCoords?
 
 	isShipDead := true
-	for _, coord := range shipCoords {
+	for _, coord := range shipCells {
 		_, isHit := field.Shots[coord]
 		if !isHit {
 			isShipDead = false
@@ -62,10 +62,10 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	if isShipDead {
 		// fill space around the ship
 		log.Info("Filling cells around the ship")
-		lastIdx := len(shipCoords) - 1
+		lastIdx := len(shipCells) - 1
 		filled := field.FillRect(
-			Cell{shipCoords[0].X - 1, shipCoords[0].Y - 1},
-			Cell{shipCoords[lastIdx].X + 1, shipCoords[lastIdx].Y + 1},
+			Cell{shipCells[0].X - 1, shipCells[0].Y - 1},
+			Cell{shipCells[lastIdx].X + 1, shipCells[lastIdx].Y + 1},
 		)
 		filledCells = append(filledCells, filled...)
 	}
