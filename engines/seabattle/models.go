@@ -34,6 +34,13 @@ var SHIP_LENGTH_BY_TYPE map[ShipKind]int = map[ShipKind]int{
 	ShipFour:  4,
 }
 
+var SHIP_AMOUNT_BY_KIND map[ShipKind]int = map[ShipKind]int{
+	ShipOne:   4,
+	ShipTwo:   3,
+	ShipThree: 2,
+	ShipFour:  1,
+}
+
 type Cell struct {
 	X int
 	Y int
@@ -53,6 +60,32 @@ type Ship struct {
 	kind      ShipKind
 	cell      Cell
 	direction Direction
+}
+
+func (s *Ship) CellsTaken() []Cell {
+	shipCoord := s.GetCells()
+	c1, c2 := shipCoord[0], shipCoord[len(shipCoord)-1]
+	res := []Cell{}
+	startX, endX := c1.X-1, c2.X+1
+	startY, endY := c1.Y-1, c2.Y+1
+	if startX < 0 {
+		startX = 0
+	}
+	if endX > 9 {
+		endX = 9
+	}
+	if startY < 0 {
+		startY = 0
+	}
+	if endY > 9 {
+		endY = 9
+	}
+	for x := startX; x <= endX; x++ {
+		for y := startY; y <= endY; y++ {
+			res = append(res, Cell{x, y})
+		}
+	}
+	return res
 }
 
 // Returns ship's cells. It's guaranteed that
@@ -87,10 +120,10 @@ func (s Ship) GetCells() []Cell {
 	return cells
 }
 
-type Ships []*Ship
+type Ships []Ship
 
-func (s Ships) GetCells() map[Cell]*Ship {
-	cells := map[Cell]*Ship{}
+func (s Ships) GetCells() map[Cell]Ship {
+	cells := map[Cell]Ship{}
 	for _, ship := range s {
 		for _, cell := range ship.GetCells() {
 			cells[cell] = ship
@@ -111,6 +144,50 @@ func NewField() *Field {
 	}
 }
 
+// TODO: write tests, add logging
+func (f *Field) PlaceShip(ship Ship) error {
+	logger := log.WithFields(
+		log.Fields{
+			"kind":      ship.kind,
+			"cell":      fmt.Sprintf("%+v", ship.cell),
+			"direction": ship.direction,
+		},
+	)
+	takenCells := f.Ships.GetCells()
+	for _, cell := range ship.CellsTaken() {
+		existingShip, isTaken := takenCells[cell]
+		if isTaken {
+			logger.WithFields(
+				log.Fields{
+					"existingShip.kind":      existingShip.kind,
+					"existsingShip.cell":     existingShip.cell,
+					"existingShip.direction": existingShip.direction,
+				},
+			).Errorf("Cannot place ship as it taken")
+			return CellIsTaken{cell}
+		}
+	}
+	shipKindCnt := 0
+	for _, existingShip := range f.Ships {
+		if ship.kind == existingShip.kind {
+			shipKindCnt++
+		}
+	}
+	allowedAmount, ok := SHIP_AMOUNT_BY_KIND[ship.kind]
+	if !ok {
+		panic(fmt.Sprintf("Unknown ship.kind=%s", ship.kind))
+	}
+	if allowedAmount == shipKindCnt {
+		return NoShipsLeft{kind: ship.kind, count: shipKindCnt}
+	} else if allowedAmount < shipKindCnt {
+		panic("We placed more ships than allowed")
+	}
+	f.Ships = append(f.Ships, ship)
+	logger.Info("Ship is successfully placed")
+	return nil
+}
+
+// Fill rectangular area from c1.X, c1.Y to c2.X, c2.Y
 func (f *Field) FillRect(c1, c2 Cell) []Cell {
 	cells := []Cell{}
 	if c1.X > c2.X || c1.Y > c2.Y {
@@ -127,14 +204,6 @@ func (f *Field) FillRect(c1, c2 Cell) []Cell {
 		}
 	}
 	return cells
-}
-
-// Check if the field is valid.
-// The field is considered to be valid if:
-//   - There is at least one cell between each ship
-//   - There is exactly(ship - amount): 4 - 1, 3 - 2, 2 - 3, 1 - 4
-func (f *Field) Validate() error {
-	return nil
 }
 
 // This method will return the matrix which represents
