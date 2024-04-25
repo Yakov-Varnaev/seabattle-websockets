@@ -62,11 +62,7 @@ func (e *Engine) Shot(targetCell Cell) ([]Cell, error) {
 	if isShipDead {
 		// fill space around the ship
 		log.Info("Filling cells around the ship")
-		lastIdx := len(shipCells) - 1
-		filled := field.FillRect(
-			Cell{shipCells[0].X - 1, shipCells[0].Y - 1},
-			Cell{shipCells[lastIdx].X + 1, shipCells[lastIdx].Y + 1},
-		)
+		filled := field.FillAround(ship)
 		filledCells = append(filledCells, filled...)
 	}
 

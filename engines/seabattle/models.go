@@ -188,19 +188,13 @@ func (f *Field) PlaceShip(ship Ship) error {
 }
 
 // Fill rectangular area from c1.X, c1.Y to c2.X, c2.Y
-func (f *Field) FillRect(c1, c2 Cell) []Cell {
+func (f *Field) FillAround(ship Ship) []Cell {
 	cells := []Cell{}
-	if c1.X > c2.X || c1.Y > c2.Y {
-		panic("c1 must be less than c2")
-	}
-	for x := c1.X; x <= c2.X; x++ {
-		for y := c1.Y; y <= c2.Y; y++ {
-			c := Cell{x, y}
-			_, wasFilled := f.Shots[c]
-			f.Shots[c] = true
-			if !wasFilled {
-				cells = append(cells, c)
-			}
+	for _, cell := range ship.CellsTaken() {
+		_, wasFilled := f.Shots[cell]
+		f.Shots[cell] = true
+		if !wasFilled {
+			cells = append(cells, cell)
 		}
 	}
 	return cells
